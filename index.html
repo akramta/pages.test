@@ -1,218 +1,10 @@
-<!-- <!DOCTYPE html>
+
+
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>أكرم بوت</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Cairo', sans-serif;
-      background-color: #1a1a1f;
-      color: #fff;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* الشريط الجانبي */
-    .sidebar {
-      width: 260px;
-      background-color: #252530;
-      padding: 25px 20px;
-      border-left: 1px solid #3a3a44;
-      display: flex;
-      flex-direction: column;
-    }
-    .sidebar h2 {
-      font-size: 22px;
-      margin-bottom: 30px;
-      color: #00c6ff;
-      text-align: center;
-    }
-    .sidebar ul {
-      list-style: none;
-      flex: 1;
-    }
-    .sidebar li {
-      margin-bottom: 15px;
-      cursor: pointer;
-      padding: 10px 12px;
-      border-radius: 8px;
-      background-color: #2c2c38;
-      transition: background 0.3s, transform 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .sidebar li:hover {
-      background-color: #3b3b4b;
-      transform: translateX(5px);
-    }
-
-    /* المنطقة الرئيسية */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px;
-      background-color: #1a1a1f;
-    }
-
-    /* صندوق المحادثة */
-    .chat-box {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      background-color: #2b2b38;
-      border-radius: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-    }
-
-    /* الرسائل */
-    .message-wrapper { display: flex; width: 100%; animation: fadeIn 0.3s ease-in; }
-    .user-wrapper { justify-content: flex-end; }
-    .bot-wrapper { justify-content: flex-start; }
-    .message {
-      padding: 12px 18px;
-      border-radius: 18px;
-      max-width: 70%;
-      font-size: 16px;
-      line-height: 1.6;
-      word-wrap: break-word;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-    .user {
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      color: #000;
-      text-align: right;
-    }
-    .bot {
-      background-color: #3e3f4b;
-      color: #fff;
-      text-align: left;
-    }
-
-    /* منطقة الإدخال */
-    .input-area { display: flex; margin-top: 20px; gap: 8px; }
-    input {
-      flex: 1;
-      padding: 14px 16px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      background-color: #20202a;
-      color: #fff;
-      outline: none;
-      transition: background 0.3s;
-    }
-    input:focus { background-color: #2c2c38; }
-    button {
-      padding: 14px 24px;
-      border: none;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      color: #fff;
-      font-size: 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-    }
-    button:hover {
-      background: linear-gradient(135deg, #0099cc, #005bb5);
-      transform: translateY(-2px);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-</head>
-<body>
-  <div class="sidebar">
-    <h2>🧠 أكرم بوت</h2>
-    <ul>
-      <li>💬 محادثة جديدة</li>
-      <li>📂 المحفوظات</li>
-      <li>⚙️ الإعدادات</li>
-    </ul>
-  </div>
-
-  <div class="main">
-    <div class="chat-box" id="chatBox">
-      <div class="message-wrapper bot-wrapper">
-        <div class="message bot">
-          مرحبًا بك! 👋 أنا المبرمج أكرم فؤاد الصالحي.<br>
-          أنا هنا لمساعدتك في حل مشاكلك البرمجية فقط.<br>
-          إذا كان لديك سؤال خارج هذا النطاق، أعتذر ولا أستطيع الرد عليه.
-        </div>
-      </div>
-    </div>
-
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="اكتب رسالتك هنا...">
-      <button onclick="sendMessage()">إرسال</button>
-    </div>
-  </div>
-
-<script>
-  async function sendMessage() {
-    const input = document.getElementById('userInput');
-    const chatBox = document.getElementById('chatBox');
-    const userMsg = input.value.trim();
-    if (userMsg === '') return;
-
-    // عرض رسالة المستخدم
-    const userWrapper = document.createElement('div');
-    userWrapper.className = 'message-wrapper user-wrapper';
-    const userDiv = document.createElement('div');
-    userDiv.className = 'message user';
-    userDiv.textContent = userMsg;
-    userWrapper.appendChild(userDiv);
-    chatBox.appendChild(userWrapper);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    // إرسال الطلب إلى Flask
-    const response = await fetch("/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `question=${encodeURIComponent(userMsg)}`
-    });
-
-    const data = await response.json();
-
-    // عرض رد البوت
-    const botWrapper = document.createElement('div');
-    botWrapper.className = 'message-wrapper bot-wrapper';
-    const botDiv = document.createElement('div');
-    botDiv.className = 'message bot';
-    botDiv.textContent = data.answer;
-    botWrapper.appendChild(botDiv);
-    chatBox.appendChild(botWrapper);
-
-    input.value = '';
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  document.getElementById("userInput").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") sendMessage();
-  });
-</script>
-</body>
-</html> -->
-
-
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>أكرم بوت</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -222,46 +14,31 @@
       background-color: #343541;
       color: #fff;
       display: flex;
+      flex-direction: row;
       height: 100vh;
     }
 
-    /* الشريط الجانبي */
     .sidebar {
       width: 250px;
-      background-color: #202123;
+      background-color: #0348d1;
       padding: 20px;
       border-left: 1px solid #444;
+      flex-shrink: 0;
     }
-    .sidebar h2 {
-      font-size: 20px;
-      margin-bottom: 20px;
-      color: #00c6ff;
-    }
-    .sidebar ul {
-      list-style: none;
-    }
-    .sidebar li {
-      margin-bottom: 10px;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 6px;
-      background-color: #2c2d35;
-      transition: background 0.3s;
-    }
-    .sidebar li:hover {
-      background-color: #3a3b45;
-    }
+    .sidebar h2 { font-size: 20px; margin-bottom: 20px; color: #00c6ff; }
+    .sidebar ul { list-style: none; }
+    .sidebar li { margin-bottom: 10px; cursor: pointer; padding: 8px; border-radius: 6px; background-color: #2c2d35; transition: background 0.3s; }
+    .sidebar li:hover { background-color: #3a3b45; }
 
-    /* المنطقة الرئيسية */
     .main {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       padding: 20px;
+      min-width: 0;
     }
 
-    /* صندوق المحادثة */
     .chat-box {
       flex: 1;
       overflow-y: auto;
@@ -273,40 +50,22 @@
       gap: 10px;
     }
 
-    /* الرسائل */
-    .message-wrapper {
-      display: flex;
-      width: 100%;
-    }
-    .user-wrapper {
-      justify-content: flex-end;
-    }
-    .bot-wrapper {
-      justify-content: flex-start;
-    }
+    .message-wrapper { display: flex; width: 100%; }
+    .user-wrapper { justify-content: flex-end; }
+    .bot-wrapper { justify-content: flex-start; }
+
     .message {
       padding: 10px 16px;
       border-radius: 12px;
       max-width: 70%;
       font-size: 16px;
       line-height: 1.5;
+      word-wrap: break-word;
     }
-    .user {
-      background-color: #00c6ff;
-      color: #000;
-      text-align: right;
-    }
-    .bot {
-      background-color: #3e3f4b;
-      color: #fff;
-      text-align: left;
-    }
+    .user { background-color: #00c6ff; color: #000; text-align: right; }
+    .bot { background-color: #3e3f4b; color: #fff; text-align: left; }
 
-    /* منطقة الإدخال */
-    .input-area {
-      display: flex;
-      margin-top: 20px;
-    }
+    .input-area { display: flex; margin-top: 20px; }
     input {
       flex: 1;
       padding: 12px;
@@ -325,136 +84,24 @@
       border-radius: 0 8px 8px 0;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #0099cc;
-    }
-  </style>
-</head>
-<body>
-  <div class="sidebar">
-    <h2>🧠 أكرم بوت</h2>
-    <ul>
-      <li>محادثة جديدة</li>
-      <li>المحفوظات</li>
-      <li>الإعدادات</li>
-    </ul>
-  </div>
-
-  <div class="main">
-    <div class="chat-box" id="chatBox"></div>
-
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="اكتب رسالتك هنا...">
-      <button onclick="sendMessage()">إرسال</button>
-    </div>
-  </div>
-
-<script>
-  const chatBox = document.getElementById('chatBox');
-
-  // تحميل التاريخ عند فتح الصفحة
-  async function loadHistory() {
-    const response = await fetch("/history");
-    const history = await response.json();
-    
-    history.forEach(msg => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'message-wrapper ' + (msg.role === 'user' ? 'user-wrapper' : 'bot-wrapper');
-      const div = document.createElement('div');
-      div.className = 'message ' + (msg.role === 'user' ? 'user' : 'bot');
-      div.textContent = msg.message;
-      wrapper.appendChild(div);
-      chatBox.appendChild(wrapper);
-    });
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  loadHistory();
-
-  async function sendMessage() {
-    const input = document.getElementById('userInput');
-    const userMsg = input.value.trim();
-    if (userMsg === '') return;
-
-    // عرض رسالة المستخدم
-    const userWrapper = document.createElement('div');
-    userWrapper.className = 'message-wrapper user-wrapper';
-    const userDiv = document.createElement('div');
-    userDiv.className = 'message user';
-    userDiv.textContent = userMsg;
-    userWrapper.appendChild(userDiv);
-    chatBox.appendChild(userWrapper);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    // إرسال الرسالة إلى FastAPI
-    const formData = new FormData();
-    formData.append("question", userMsg);
-
-    const response = await fetch("/ask", {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await response.json();
-
-    // عرض رد البوت
-    const botWrapper = document.createElement('div');
-    botWrapper.className = 'message-wrapper bot-wrapper';
-    const botDiv = document.createElement('div');
-    botDiv.className = 'message bot';
-    botDiv.textContent = data.answer;
-    botWrapper.appendChild(botDiv);
-    chatBox.appendChild(botWrapper);
-
-    input.value = '';
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-
-  // إرسال عند الضغط على Enter
-  document.getElementById("userInput").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") sendMessage();
-  });
-</script>
-</body>
-</html> -->
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <title>أكرم بوت</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Cairo', sans-serif;
-      background-color: #343541;
-      color: #fff;
-      display: flex;
-      height: 100vh;
-    }
-    .sidebar {
-      width: 250px;
-      background-color: #202123;
-      padding: 20px;
-      border-left: 1px solid #444;
-    }
-    .sidebar h2 { font-size: 20px; margin-bottom: 20px; color: #00c6ff; }
-    .sidebar ul { list-style: none; }
-    .sidebar li { margin-bottom: 10px; cursor: pointer; padding: 8px; border-radius: 6px; background-color: #2c2d35; transition: background 0.3s; }
-    .sidebar li:hover { background-color: #3a3b45; }
-    .main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
-    .chat-box { flex: 1; overflow-y: auto; padding: 10px; background-color: #444654; border-radius: 12px; display: flex; flex-direction: column; gap: 10px; }
-    .message-wrapper { display: flex; width: 100%; }
-    .user-wrapper { justify-content: flex-end; }
-    .bot-wrapper { justify-content: flex-start; }
-    .message { padding: 10px 16px; border-radius: 12px; max-width: 70%; font-size: 16px; line-height: 1.5; }
-    .user { background-color: #00c6ff; color: #000; text-align: right; }
-    .bot { background-color: #3e3f4b; color: #fff; text-align: left; }
-    .input-area { display: flex; margin-top: 20px; }
-    input { flex: 1; padding: 12px; border: none; border-radius: 8px 0 0 8px; font-size: 16px; background-color: #202123; color: #fff; }
-    button { padding: 12px 20px; border: none; background-color: #00c6ff; color: #fff; font-size: 16px; border-radius: 0 8px 8px 0; cursor: pointer; }
     button:hover { background-color: #0099cc; }
+
+    /* استجابة للشاشات الصغيرة */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; border-left: none; border-bottom: 1px solid #444; }
+      .main { padding: 10px; }
+      .message { font-size: 14px; max-width: 85%; }
+      input, button { font-size: 14px; padding: 10px; }
+    }
+
+    @media (max-width: 480px) {
+      .sidebar h2 { font-size: 18px; }
+      .sidebar li { padding: 6px; font-size: 14px; }
+      .message { font-size: 13px; }
+      .input-area { flex-direction: column; gap: 10px; }
+      input, button { width: 100%; border-radius: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -487,7 +134,6 @@
     const userMsg = input.value.trim();
     if (userMsg === '') return;
 
-    // عرض رسالة المستخدم
     const userWrapper = document.createElement('div');
     userWrapper.className = 'message-wrapper user-wrapper';
     const userDiv = document.createElement('div');
@@ -497,7 +143,6 @@
     chatBox.appendChild(userWrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // إرسال الطلب إلى FastAPI
     const response = await fetch("/ask", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -506,7 +151,6 @@
 
     const data = await response.json();
 
-    // عرض رد البوت
     const botWrapper = document.createElement('div');
     botWrapper.className = 'message-wrapper bot-wrapper';
     const botDiv = document.createElement('div');
@@ -519,7 +163,6 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  // إرسال عند الضغط على Enter
   document.getElementById("userInput").addEventListener("keypress", function(e) {
     if (e.key === "Enter") sendMessage();
   });
